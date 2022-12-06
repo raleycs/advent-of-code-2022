@@ -27,5 +27,4 @@ print(max_calories)
 # Part 2 solution
 # Time-complexity: O(n log(n))
 heapq.heapify(calories)
-top_3 = heapq.nlargest(3, calories)
-print(sum(top_3))
+print(sum(heapq.nlargest(3, calories)))
