@@ -1,53 +1,38 @@
-# Read input
-f = open('input.txt', 'r')
+import numpy as np
 
-visited = dict({"0,0" : True})
-visited_once = 1
+class Knot:
+    def __init__(self, id: int, x: int, y: int):
+        self.id = id # Debugging
+        self.x = x
+        self.y = y
+    def __sub__(self, knot):
+        return Knot(-1, self.x - knot.x, self.y - knot.y)
+    def norm(self):
+        return np.linalg.norm([self.x, self.y])
 
-row_head, col_head = 0, 0
-row_tail, col_tail = 0, 0
+rope_moves = [direction_steps.split() for direction_steps in open('input.txt')]
 
-# Read each line in the input
-for line in f:
-    line = line.split()
-    direction = line[0]
-    moves = line[1]
+# total_knots = 2 # Part 1
+total_knots = 10 # Part 2
+rope = [Knot(n, 0, 0) for n in range(total_knots)]
+tail_positions = {(rope[-1].x, rope[-1].y)}
 
-    for i in range(0, int(moves)):
-        if direction == "R":
-            col_head += 1
-            if abs(col_head - col_tail) > 1:
-                if abs(row_head - row_tail) != 0:
-                    row_tail = row_head
-                col_tail += 1
-        elif direction == "L":
-            col_head -= 1
-            if abs(col_head - col_tail) > 1:
-                if abs(row_head - row_tail) != 0:
-                    row_tail = row_head
-                col_tail -= 1
-        elif direction == "U":
-            row_head += 1
-            if abs(row_head - row_tail) > 1:
-                if abs(col_head - col_tail) != 0:
-                    col_tail = col_head
-                row_tail += 1
+for direction, magnitude in rope_moves:
+    for _ in range(int(magnitude)):
+        if direction == 'U':
+            rope[0].y += 1
+        elif direction == 'D':
+            rope[0].y -= 1
+        elif direction == 'R':
+            rope[0].x += 1
         else:
-            row_head -= 1
-            if abs(row_head - row_tail) > 1:
-                if abs(col_head - col_tail) != 0:
-                    col_tail = col_head
-                row_tail -= 1
-        current_tail = ",".join([str(col_tail), str(row_tail)])
-        current_head = ",".join([str(col_head), str(row_head)])
-        if current_tail not in visited:
-            visited[current_tail] = True
-            visited_once += 1
-        # print("Head: " + current_head)
-        # print("Tail: " + current_tail)
-        # print("---------")
+            rope[0].x -= 1
+        for i in range(total_knots - 1):
+            # If distance is greater than 2, adjust
+            if (rope[i] - rope[i + 1]).norm() >= 2:
+                rope[i + 1].x += (rope[i + 1].x != rope[i].x) * np.sign(rope[i].x - rope[i + 1].x)
+                rope[i + 1].y += (rope[i + 1].y != rope[i].y) * np.sign(rope[i].y - rope[i + 1].y)
+                if i + 1 == total_knots - 1:
+                    tail_positions.add((rope[total_knots - 1].x, rope[total_knots - 1].y))
 
-# for location, been_visited in visited.items():
-#     if been_visited:
-        # print(location)
-print(visited_once)
+print(len(tail_positions))
