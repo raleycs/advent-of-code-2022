@@ -29,7 +29,6 @@ for line in f:
         line = line.replace(',', '')
         items = deque(list(map(int, line.split()[2:])))
     elif 'Operation' in line:
-        # line = line.replace('old', 'item')
         line = line.replace('old', 'item')
         operation = ' '.join(line.split()[3:])
     elif 'Test' in line:
